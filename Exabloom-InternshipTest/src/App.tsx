@@ -1,65 +1,51 @@
-// Importing necessary modules and components
-import { useState, useCallback } from 'react';
-import { ReactFlow, applyEdgeChanges, applyNodeChanges, addEdge } from '@xyflow/react';
+// Importing the necessary libraries and components
+import {
+  ReactFlow,
+  useNodesState,
+  useEdgesState,
+} from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import ButtonEdge from './customEdge';
 
-// Custom node styles
+// Declaring nodeStyle mainly for the text and the custom colors
 const nodeStyle = {
   background: '#f7f7f7',
   color: '#333',
   border: '1px solid #ddd',
   borderRadius: '5px',
   padding: '10px',
-  fontWeight: 'bold'
+  fontWeight: 'bold',
 };
 
-//Declaring the initial nodes and edges
-const initialNodes = [
-  { 
-    id: '1', 
-    position: { x: 0, y: 0 }, 
-    data: { label: 'Start' },
-    style: nodeStyle
-  },
-  { 
-    id: '2', 
-    position: { x: 0, y: 100 }, 
-    data: { label: 'End' },
-    style: nodeStyle 
-  },
-];
-
-const initialEdges = [
-    { id: 'e1-2', source: '1', target: '2', animated: true },
-];
-
-// Main App component
 export default function App() {
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
 
-  const onNodesChange = useCallback(
-    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-    [setNodes],
-  );
-  const onEdgesChange = useCallback(
-    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    [setEdges],
-  );
-  const onConnect = useCallback(
-    (connection) => setEdges((eds) => addEdge(connection, eds)),
-    [setEdges],
-  );
+  // Declaring the edgeTypes object to register the custom edge component imported above
+  const edgeTypes = { buttonedge: ButtonEdge };
+
+  // Declaring the initial nodes and edges
+  const [nodes, setNodes, onNodesChange] = useNodesState([
+    { id: 'start', position: { x: 0, y: 0 }, data: { label: 'Start' }, style: nodeStyle },
+    { id: 'end', position: { x: 0, y: 100 }, data: { label: 'End' }, style: nodeStyle },
+  ]);
+
+  const [edges, setEdges, onEdgesChange] = useEdgesState([{
+    id: 'e1-2',
+    source: 'start',
+    target: 'end',
+    animated: true,
+    label: '+',
+    type: 'buttonedge',
+  }]);
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
-      <ReactFlow 
-        nodes={nodes} 
+      <ReactFlow
+        nodes={nodes}
         edges={edges}
+        edgeTypes={edgeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        fitView 
+        fitView
       />
     </div>
   );
