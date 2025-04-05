@@ -1,15 +1,9 @@
-// Since we need the button on the edges, we need to create a custom edge component.
-// This component will render a button on the edge and handle the click event.
+// This custom edge component adds a button on edges
+import { EdgeLabelRenderer, getBezierPath } from "@xyflow/react";
 
-// Import necessary libraries and components
-import {
-  EdgeLabelRenderer,
-  getBezierPath,
-} from '@xyflow/react';
-
-// Declaring the ButtonEdge component as an export default function.
+// Custom edge component with a clickable button
 export default function ButtonEdge(props) {
-  // Destructuring the props object to extract necessary properties based on the syntax from the documentation.
+  // Extract the props we need from ReactFlow
   const {
     id,
     sourceX,
@@ -18,11 +12,10 @@ export default function ButtonEdge(props) {
     targetY,
     sourcePosition,
     targetPosition,
-    label,
+    data,
   } = props;
 
-  // Using the getBezierPath function to calculate the path of the edge.
-  // This function takes the source and target coordinates, as well as their positions, to create a bezier curve path.
+  // Calculate the path and center point of the edge
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -31,35 +24,46 @@ export default function ButtonEdge(props) {
     targetY,
     targetPosition,
   });
+
+  // Handle button clicks and pass the event up to the parent
+  const handleButtonClick = () => {
+    // If we have a click handler in the data prop, call it
+    if (data && data.onClick) {
+      data.onClick(id, { x: labelX, y: labelY });
+    }
+  };
+
   return (
     <>
-      {/* The path element is used to draw the edge. The id is set to the id passed in props, and the className is set to a specific class for styling. */}
-      {/* The d attribute of the path element is set to the edgePath calculated earlier. */}
-      {/* The EdgeLabelRenderer component is used to render the label on the edge with additional customizations and tweaks. */}    
+      {/* Draw the actual edge path */}
       <path id={id} className="react-flow__edge-path" d={edgePath} />
+
+      {/* Render the button at the midpoint of the edge */}
       <EdgeLabelRenderer>
         <div
           style={{
-            position: 'absolute',
+            position: "absolute",
             transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
-            pointerEvents: 'all',
+            pointerEvents: "all",
           }}
         >
-          <button 
-          onClick={() => console.log("Button clicked!")}
-          style={{
-              background: '#FFFFFF',
-              color: '#333333',
-              cursor: 'pointer',
-              fontSize: '12px',
-              padding: '2px 4px',
-              minWidth: '20px',
-              minHeight: '20px',
-              lineHeight: '1',
-              border: '1px solid #ccc',
-              borderRadius: '2px'
-          }}
-            >{label}</button>
+          <button
+            onClick={handleButtonClick}
+            style={{
+              background: "#FFFFFF",
+              color: "#333333",
+              cursor: "pointer",
+              fontSize: "12px",
+              padding: "2px 4px",
+              minWidth: "20px",
+              minHeight: "20px",
+              lineHeight: "1",
+              border: "1px solid #ccc",
+              borderRadius: "2px",
+            }}
+          >
+            +
+          </button>
         </div>
       </EdgeLabelRenderer>
     </>
